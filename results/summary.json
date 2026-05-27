@@ -1,0 +1,15 @@
+{
+  "samples": 59,
+  "luminal_a": 29,
+  "luminal_b": 30,
+  "genes_tested": 13823,
+  "significant_fdr05": 4310,
+  "significant_fdr05_abs_log2fc_ge_0_5": 2775,
+  "pathways_tested": 1568,
+  "pathways_fdr05": 75,
+  "pca_variance_pc1": 0.15210990894024232,
+  "pca_variance_pc2": 0.09290161191993543,
+  "geo_sha256": "741184cd3b3354ed3ea45fc6a428ed36401cadc20505e5cc5fb381d8aed0ad35",
+  "annotation_sha256": "d7cd44352127b1e34f3a720ebea86093ef255a38f1612a85a2962b71bde8f394",
+  "reactome_sha256": "89983d5c1f0af11c52edfeee7323eb425580ac6281d387a528562ab1787ce56b"
+}
