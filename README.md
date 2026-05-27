@@ -101,7 +101,7 @@ The notebook command executes notebooks 01–06 in order from the repository roo
 
 ## Detailed LaTeX report
 
-The [detailed research report](reports/molecular_transcriptomic_analysis.pdf) is typeset from [editable LaTeX source](reports/molecular_transcriptomic_analysis.tex), with expanded methods, equations, marker and pathway tables, eight figures, references and reproducibility appendices. See the [build and Overleaf instructions](reports/LATEX_README.md). `python -m scripts.build_report` requires XeLaTeX (MiKTeX or TeX Live) and generates an upload-ready `reports/latex_source.zip`. The older `.qmd` is retained as the earlier short narrative.
+The [detailed research report](reports/molecular_transcriptomic_analysis.pdf) is typeset from [editable LaTeX source](reports/molecular_transcriptomic_analysis.tex), with expanded methods, equations, marker and pathway tables, eight figures, references and reproducibility appendices. Download the [complete LaTeX source ZIP](reports/latex_source.zip) for Overleaf, or see the [build instructions](reports/LATEX_README.md). `python -m scripts.build_report` requires XeLaTeX (MiKTeX or TeX Live) and generates an upload-ready `reports/latex_source.zip`. The older `.qmd` is retained as the earlier short narrative.
 
 ## Project structure
 
