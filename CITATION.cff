@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this software, cite this repository and the original GSE45827 study."
+title: "Molecular and Transcriptomic Analysis of Hormone Receptor-Positive Breast Cancer"
+type: software
+authors:
+  - family-names: Anpalakan
+    given-names: Tharuniya
+date-released: 2026-10-16
+version: 0.1.0
+license: MIT

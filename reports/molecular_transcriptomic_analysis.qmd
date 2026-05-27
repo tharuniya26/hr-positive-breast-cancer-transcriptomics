@@ -1,0 +1,96 @@
+---
+title: "Molecular and Transcriptomic Analysis of Hormone Receptor-Positive Breast Cancer"
+author: "Tharuniya Anpalakan"
+date: "16 October 2026"
+format: pdf
+---
+
+# Abstract
+
+Hormone receptor-positive breast cancer includes transcriptionally diverse tumours. This secondary analysis compared 29 source-labelled Luminal A and 30 source-labelled Luminal B primary invasive tumours from the public GSE45827 Affymetrix microarray dataset. GEO-reported GC-RMA log2 measurements were mapped to one unambiguous probe per gene and analysed using batch-adjusted linear models with empirical-Bayes variance moderation. Of 13,823 genes tested, 4,310 met a Benjamini–Hochberg FDR below 0.05; 2,775 also had an absolute log2 difference of at least 0.5. *PGR* was lower in labelled Luminal B (−4.993, FDR 1.57×10⁻⁷), whereas *MKI67* (+2.716, FDR 7.82×10⁻¹¹) and *ERBB2* (+3.350, FDR 3.65×10⁻¹³) were higher. *ESR1* did not show a significant group difference. Reactome release 97 over-representation identified cell-cycle, mitotic and G1/S categories; the leading Cell Cycle, Mitotic set had 164 overlapping genes (FDR 2.41×10⁻¹²). The source subtype labels are not independently validated by receptor IHC or PAM50 in the selected matrix. These results are observational transcriptomic associations, not evidence of pathway activation, treatment sensitivity or clinical utility.
+
+# Introduction and literature background
+
+Breast cancers are often described by ER, PR and HER2 immunohistochemistry or by intrinsic expression classes including Luminal A, Luminal B, HER2-enriched and basal-like. These approaches overlap but are not equivalent. PAM50 is a defined expression-based classifier; ER positivity alone does not identify Luminal A (Parker et al., 2009). ERα, encoded by ESR1, controls ligand-dependent transcription. PR, encoded by PGR, is an ER-regulated marker and can modify ER chromatin action (Mohammed et al., 2015).
+
+Hormone-responsive programmes intersect with growth-factor, PI3K/AKT/mTOR, MAPK/ERK and CCND1–CDK4/6–RB–E2F networks. Experimental mammary models link progesterone to RANKL and WNT4 paracrine signalling, but context and cellular composition matter (Beleut et al., 2010; Schramek et al., 2010). ESR1 ligand-binding-domain mutations are an established resistance mechanism in some endocrine-treated metastatic tumours (Toy et al., 2013; Robinson et al., 2013). This untreated primary-tumour dataset cannot test acquired resistance.
+
+# Objectives
+
+The study asks whether labelled Luminal A and Luminal B tumours differ in gene expression and whether the corresponding gene list is enriched for established pathways. Focused markers are ESR1, PGR, ERBB2, MKI67, CCND1, FOXO1, WNT4 and TNFSF11. The objective is descriptive molecular interpretation, not clinical validation.
+
+# Materials and methods
+
+GSE45827 was deposited by Gruosso and colleagues and accompanied a study of oxidative stress and H2AX (Gruosso et al., 2016). The GPL570 series matrix has 155 columns: 130 tumours, 11 normal tissues and 14 cell lines. The present analysis selected 29 Luminal A and 30 Luminal B primary invasive tumours using the GEO `tumor subtype` field and excluded all other columns. No individual ER/PR IHC values, PAM50 calls or treatment outcomes were supplied for this contrast. The platform is the Affymetrix Human Genome U133 Plus 2.0 Array; GEO reports GC-RMA log2 preprocessing. No RNA-seq normalisation was applied.
+
+Input integrity checks covered unique GSM and probe IDs, matrix alignment, finite intensities and expected group counts. A 2016 GPL570 annotation mapped probes to symbols. Ambiguously mapped probes were removed, and one probe per symbol was selected by highest overall mean intensity independently of the subtype contrast. Sample distributions and PCA of the 3,000 most variable mapped genes were inspected; no sample was removed post hoc. Batches 1–5 were represented in both selected groups.
+
+The per-gene model included an intercept, Luminal B indicator and batch fixed effects. The B coefficient is the log2 signal difference versus A. Residual variances were moderated toward a common empirical-Bayes prior and two-sided moderated t probabilities were adjusted with Benjamini–Hochberg. This Python implementation follows a subset of limma's approach (Smyth, 2004; Ritchie et al., 2015), but has not been numerically cross-validated against Bioconductor limma. The primary FDR threshold was 0.05. A descriptive hit list additionally required absolute log2 difference at least 0.5.
+
+Reactome release 97 over-representation used a hypergeometric test. The universe comprised all 13,823 measured and tested genes; the foreground comprised 2,775 genes meeting both criteria. Sets with 10–500 measured genes were tested, followed by BH adjustment. The official GMT was SHA-pinned. Enrichment is non-directional and does not demonstrate activity.
+
+![Figure 1. Analysis workflow. Conceptual diagram.](../figures/01_workflow.png)
+
+# Results
+
+The 59 tumours yielded 13,823 mapped genes. No missing values occurred in the selected matrix. PCA PC1 explained 15.2% and PC2 9.3% of variance in the selected high-variance genes. PCA provides an exploratory display; separation may reflect subtype assignment, technical variation or other unmeasured covariates.
+
+![Figure 2. PCA of 3,000 highly variable measured genes, coloured by source subtype.](../figures/02_pca.png)
+
+The batch-adjusted analysis found 4,310 genes at FDR below 0.05; 2,775 also had an absolute log2 difference at least 0.5. The volcano plot shows adjusted significance and effect sizes. These thresholds are descriptive and do not establish biological importance.
+
+![Figure 3. Volcano plot of observed Luminal B minus Luminal A differences and adjusted p-values.](../figures/03_volcano.png)
+
+The displayed 30 leading genes show a prominent group pattern after per-gene z scaling. Z scores describe relative within-gene deviations and cannot be compared as absolute expression between genes.
+
+![Figure 4. Heatmap of 30 differential genes, with samples ordered by label.](../figures/04_heatmap.png)
+
+Among focused markers, PGR was lower in B (log2 difference −4.993; FDR 1.57×10⁻⁷), and MKI67 (+2.716; FDR 7.82×10⁻¹¹) and ERBB2 (+3.350; FDR 3.65×10⁻¹³) were higher. ESR1 (−0.228; FDR 0.673), CCND1 (+0.165; FDR 0.640) and WNT4 (+0.548; FDR 0.404) did not meet the FDR criterion. FOXO1 was modestly lower (−0.453; FDR 0.041), although its transcript does not reveal nuclear protein activity. TNFSF11 was not significantly different (−0.149; FDR 0.769). The high ERBB2 signal may reflect heterogeneity in the source Luminal B group; HER2 receptor status cannot be inferred from this single assay.
+
+![Figure 5. Normalized marker signals, individual samples, means and approximate 95% confidence intervals.](../figures/05_markers.png)
+
+Of 1,568 tested Reactome sets, 75 had FDR below 0.05. Cell Cycle, Mitotic was the strongest (164 overlapping genes; FDR 2.41×10⁻¹²), followed by Mitotic G1 phase and G1/S transition (61; 2.51×10⁻⁸), G1/S Transition (53; 2.17×10⁻⁷), and Cell Cycle Checkpoints (89; 2.17×10⁻⁷). These nested and overlapping sets should not be counted as independent mechanisms.
+
+![Figure 6. Top FDR-significant Reactome over-representation results; non-directional.](../figures/06_pathways.png)
+
+# Biological interpretation and therapeutic context
+
+Higher MKI67 and enrichment of mitotic programmes are consistent with a larger proliferation-associated transcript fraction in source-labelled Luminal B tumours. Lower PGR suggests a different hormone-responsive transcriptional state. ESR1 mRNA did not differ significantly; ER protein abundance, transcriptional activity and endocrine sensitivity remain unmeasured. The observed ERBB2 difference does not establish HER2 protein positivity or a treatment indication. RANKL, WNT4, PI3K/AKT and MAPK relationships in the schematic are literature-based; this dataset does not directly measure their activation.
+
+![Figure 7. Literature-based ER/PR and growth-factor signalling schematic; arrows are context-dependent.](../figures/07_signalling.png)
+
+Tamoxifen modulates ER; fulvestrant degrades ER; anastrozole inhibits aromatase. Approved CDK4/6 inhibitors block the cyclin D–CDK4/6 axis in defined settings, and docetaxel stabilises microtubules. Onapristone is a PR antagonist studied in early-phase work and remains investigational for breast cancer (Cottu et al., 2018; NCI, 2026). The map describes targets, not therapies predicted for any sample.
+
+![Figure 8. Therapeutic targets; onapristone is marked investigational.](../figures/08_therapies.png)
+
+# Discussion, limitations and conclusion
+
+The analysis documents a reproducible, exploratory contrast in a real public cohort. Its marker and enrichment patterns are broadly compatible with distinct proliferation and endocrine-associated transcriptional states, but the interpretation is constrained by source subtype labels, missing IHC and clinical covariates, possible platform and batch effects, an older probe annotation, single-cohort selection and lack of independent limma validation. mRNA, pathway membership and group association cannot establish causation, protein activity, ESR1 mutation, prognosis or drug response. A stronger follow-up would independently subtype samples using documented IHC or PAM50 measurements, verify the model against limma and replicate findings in another cohort.
+
+# Reproducibility statement
+
+Code and source are in this repository. Run `python -m scripts.download_data`, place the documented Reactome GMT in `data/raw/`, then run `python -m scripts.run_analysis`, `python -m scripts.build_report` and `python -m pytest -q`. `results/summary.json` records input SHA-256 values. Raw public data and historical academic documents are Git-ignored. AI assistance was used for coding and prose drafting; final scientific and release review remains the author's responsibility.
+
+# References
+
+Beleut M et al. (2010). PNAS 107:2989–2994. doi:10.1073/pnas.0915148107.
+
+Cottu P et al. (2018). PLOS ONE. doi:10.1371/journal.pone.0204973.
+
+Gruosso T et al. (2016). EMBO Molecular Medicine 8:527–549. doi:10.15252/emmm.201505891.
+
+Mohammed H et al. (2015). Nature 523:313–317. doi:10.1038/nature14583.
+
+Parker JS et al. (2009). Journal of Clinical Oncology 27:1160–1167. doi:10.1200/JCO.2008.18.1370.
+
+Ritchie ME et al. (2015). Nucleic Acids Research 43:e47. doi:10.1093/nar/gkv007.
+
+Robinson DR et al. (2013). Nature Genetics 45:1446–1451. doi:10.1038/ng.2823.
+
+Schramek D et al. (2010). Nature 468:98–102. doi:10.1038/nature09387.
+
+Smyth GK (2004). Statistical Applications in Genetics and Molecular Biology 3. doi:10.2202/1544-6115.1027.
+
+Toy W et al. (2013). Nature Genetics 45:1439–1445. doi:10.1038/ng.2822.
+
+NCI (2026). Breast cancer hormone therapy and approved drug resources: cancer.gov.
