@@ -99,6 +99,10 @@ python -m pytest -q
 
 The notebook command executes notebooks 01–06 in order from the repository root after the pipeline has generated its outputs. They use functions in `src/` and the pipeline outputs. `data/raw/` and `data/processed/` are ignored by Git. Input hashes are recorded in `results/summary.json`. The private historical source documents are also ignored.
 
+## Detailed LaTeX report
+
+The [detailed research report](reports/molecular_transcriptomic_analysis.pdf) is typeset from [editable LaTeX source](reports/molecular_transcriptomic_analysis.tex), with expanded methods, equations, marker and pathway tables, eight figures, references and reproducibility appendices. See the [build and Overleaf instructions](reports/LATEX_README.md). `python -m scripts.build_report` requires XeLaTeX (MiKTeX or TeX Live) and generates an upload-ready `reports/latex_source.zip`. The older `.qmd` is retained as the earlier short narrative.
+
 ## Project structure
 
 `src/` holds reusable analysis and plotting code; `scripts/` holds entry points; `data/metadata/` holds public sample classifications; `results/` and `figures/` hold executed outputs; `notebooks/` provides an inspectable narrative; `reports/` contains the editable report and PDF; `docs/` records source decisions, methods and audit; `references/` contains verified bibliography entries.

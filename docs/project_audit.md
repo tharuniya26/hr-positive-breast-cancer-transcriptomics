@@ -18,7 +18,7 @@ Status terms: **passed** means directly checked in this workspace; **not verifie
 | Figures based on actual results | Passed | Figures 2–6 generated from executed tables/matrix. Figures 1, 7 and 8 clearly identified as conceptual. PNG and SVG generated. |
 | Notebook execution | Passed | Six notebooks executed sequentially with `nbclient` from repository root on 16 October 2026, including within the isolated environment. All code cells have execution counts and zero error outputs. Windows emitted a nonfatal ZMQ teardown warning after the last kernel. |
 | Automated tests | Passed | Clean-environment `python -m pytest -q`: 8 passed. Tests cover real input dimensions, duplicated IDs, missing data, PCA determinism, differential-model structure, both Reactome GMT formats, ORA universe, explicit missing-marker status and figure output. |
-| Report PDF and editable source | Passed | Eight-page PDF rendered from `.qmd` by `scripts/build_report.py`; text extraction and page count checked. |
+| Report PDF and editable source | Passed | 20-page detailed PDF compiled from `.tex` with XeLaTeX by `scripts/build_report.py`; tables regenerated from saved CSV results, linked references, eight figures and two appendices. Source bundle and typography checks are documented in `reports/LATEX_README.md`. The earlier `.qmd` narrative is retained. |
 | Bibliographic authenticity | Passed for cited core references | Dataset article, subtype, PR, RANKL, model and resistance DOIs checked against GEO/publisher or PubMed records; inconsistent source bibliography entries omitted. Not every historical-source citation was exhaustively audited because it was not reused. |
 | Fresh isolated environment | Passed | A new `.venv` was installed from `requirements.txt`; download verification, full pipeline, PDF build, eight tests and six notebooks completed there. The check caught and resolved a missing `statsmodels` dependency. Tested with Python 3.14.2, NumPy 2.5.4, pandas 3.0.6, SciPy 1.18.1, statsmodels 0.15.0 and Matplotlib 3.11.2. |
 | Independent biological/clinical validation | Not verified | One observational cohort; no IHC, outcome, treatment or external validation dataset. No clinical claims made. |
@@ -37,3 +37,7 @@ Status terms: **passed** means directly checked in this workspace; **not verifie
 1. Cross-validate the moderated coefficients, degrees of freedom and p-values against Bioconductor limma on the same matrix and design.
 2. Preserve the official V97 GMT checksum and rerun enrichment if the Reactome release is changed.
 3. Replicate marker and cell-cycle patterns in an independent cohort with documented IHC or PAM50 labels and appropriate covariates.
+
+## LaTeX report verification
+
+The detailed report was compiled in three XeLaTeX passes. The final log contains no unresolved references or overfull boxes. Embedded Times New Roman fonts, eight figure images, report text and representative rendered pages were checked. The 17-file source archive was extracted into an isolated directory and compiled successfully without access to the repository result tables or private inputs.

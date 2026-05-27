@@ -1,0 +1,308 @@
+% Compile with XeLaTeX from reports/, or run python -m scripts.build_report.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=25mm,headheight=15pt]{geometry}
+\usepackage{fontspec}
+\IfFontExistsTF{Times New Roman}{\setmainfont{Times New Roman}}{\setmainfont{TeX Gyre Termes}}
+\IfFontExistsTF{Arial}{\setsansfont{Arial}}{\setsansfont{TeX Gyre Heros}}
+\IfFontExistsTF{Consolas}{\setmonofont[Scale=0.85]{Consolas}}{\setmonofont[Scale=0.85]{Latin Modern Mono}}
+\usepackage{amsmath,amssymb,graphicx,booktabs,tabularx,longtable}
+\usepackage{caption,fancyhdr,xcolor}
+\usepackage[unicode,hidelinks]{hyperref}
+\hypersetup{pdftitle={Molecular and Transcriptomic Analysis of Hormone Receptor-Positive Breast Cancer},pdfauthor={Tharuniya Anpalakan},pdfsubject={Secondary analysis of GSE45827}}
+\graphicspath{{../figures/}{figures/}}
+\definecolor{ink}{HTML}{223447}
+\captionsetup{font=small,labelfont=bf,justification=justified,singlelinecheck=false,skip=8pt}
+\linespread{1.12}
+\setlength{\parindent}{1.2em}
+\setlength{\parskip}{3pt}
+\setlength{\emergencystretch}{2em}
+\renewcommand{\arraystretch}{1.18}
+\setcounter{tocdepth}{2}
+\setcounter{topnumber}{2}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\textfraction}{0.08}
+\renewcommand{\floatpagefraction}{0.75}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\itshape Molecular and transcriptomic analysis}
+\fancyhead[R]{\small GSE45827}
+\fancyfoot[L]{\small Tharuniya Anpalakan}
+\fancyfoot[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\newcommand{\gene}[1]{\textit{#1}}
+\newcommand{\fig}[4]{\begin{figure}[!htbp]\centering\includegraphics[width=#2\linewidth]{#1}\caption{#3}\label{#4}\end{figure}}
+\begin{document}
+\begin{titlepage}
+\thispagestyle{empty}
+\setlength{\parindent}{0pt}
+\vspace*{14mm}
+{\sffamily\small COMPUTATIONAL RESEARCH REPORT\par}
+\vspace{8mm}
+{\color{ink}\rule{\linewidth}{0.6pt}\par}
+\vspace{10mm}
+{\fontsize{27}{33}\selectfont\bfseries\raggedright Molecular and\\Transcriptomic Analysis\\of Hormone Receptor-Positive\\Breast Cancer\par}
+\vspace{9mm}
+{\large A comparative study of source-labelled Luminal A and Luminal B tumours in GSE45827\par}
+\vspace{22mm}
+{\large Tharuniya Anpalakan\par}
+\vspace{3mm}
+{16 October 2026\par}
+\vfill
+\noindent\begin{tabular}{@{}ll@{}}
+Study design & Secondary analysis of public microarray data\\
+Cohort & 59 primary tumours; 29 Luminal A and 30 Luminal B\\
+Platform & Affymetrix Human Genome U133 Plus 2.0 Array\\
+Scope & Molecular interpretation and reproducible computation
+\end{tabular}
+\vspace{8mm}
+\end{titlepage}
+\pagenumbering{roman}
+\section*{Abstract}
+\addcontentsline{toc}{section}{Abstract}
+Hormone receptor-positive breast cancer encompasses distinct transcriptional states, particularly in relation to steroid-receptor signalling and proliferation. This study examined how these features differed between source-labelled Luminal A and Luminal B tumours in the public GSE45827 microarray cohort. The analysis selected 29 Luminal A and 30 Luminal B primary invasive tumours from 155 deposited samples. GEO-reported GC-RMA log$_2$ intensities were mapped to 13,823 genes using unambiguous probe annotations. Group differences were estimated with a linear model containing subtype and batch, followed by empirical-Bayes variance moderation and Benjamini--Hochberg adjustment. Reactome release 97 supplied pathway definitions for over-representation analysis.
+
+Of the genes tested, 4,310 had an adjusted $p<0.05$; 2,775 also had an absolute log$_2$ difference of at least 0.5. Within this latter set, 1,509 genes had higher and 1,266 had lower signals in Luminal B. The strongest differences among the principal markers were lower \gene{PGR} ($-4.993$; adjusted $p=1.57\times10^{-7}$), higher \gene{MKI67} ($+2.716$; $7.82\times10^{-11}$), and higher \gene{ERBB2} ($+3.350$; $3.65\times10^{-13}$). \gene{ESR1} did not meet the significance threshold. Seventy-five of 1,568 eligible Reactome sets met the pathway-level threshold. Cell Cycle, Mitotic was the leading set, with 164 overlapping genes and an adjusted $p=2.41\times10^{-12}$.
+
+The findings support a difference in proliferation-associated and progesterone-receptor-associated transcription between the two labelled groups. Interpretation is limited by the absence of independently verified receptor status, clinical covariates and external replication. The custom moderated model has not been numerically validated against Bioconductor limma. Transcript abundance and pathway membership therefore support descriptive associations; they do not establish receptor activity, endocrine resistance or treatment response.
+
+\vspace{5mm}
+\noindent\textbf{Keywords:} breast cancer; luminal subtypes; oestrogen receptor; progesterone receptor; microarray; differential expression; Reactome.
+
+\section*{Abbreviations}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+BH & Benjamini--Hochberg multiple-testing adjustment\\
+ER / PR & Oestrogen receptor / progesterone receptor\\
+FDR & False discovery rate\\
+GEO & Gene Expression Omnibus\\
+HER2 & Human epidermal growth factor receptor 2\\
+IHC & Immunohistochemistry\\
+ORA & Over-representation analysis\\
+PCA & Principal component analysis
+\end{tabularx}
+\clearpage
+\begingroup
+\small\linespread{1.0}\selectfont
+\tableofcontents
+\endgroup
+\clearpage
+\pagenumbering{arabic}
+
+\section{Introduction}
+\subsection{Clinical categories and transcriptional heterogeneity}
+Breast tumours are classified using several kinds of evidence. ER, PR and HER2 assays describe clinically relevant receptor features, whereas intrinsic expression classifiers describe patterns across many transcripts. These classifications overlap, but they are not interchangeable. A tumour described as hormone receptor-positive is not necessarily assigned to one particular luminal expression class. The PAM50 work illustrates the value of a defined multigene classifier and the need to distinguish a molecular classification from a single receptor measurement \cite{Parker2009}.
+
+This distinction determines the scope of the present study. GSE45827 provides source annotations labelled Luminal A and Luminal B. Those annotations allow a reproducible comparison, but the selected matrix does not provide the receptor IHC measurements or independent PAM50 calls needed to verify how each sample would be classified under another system. Throughout this report, ``Luminal A'' and ``Luminal B'' refer to the deposited labels. The title identifies the biological topic; it does not certify hormone-receptor positivity for every individual sample.
+
+\subsection{Oestrogen and progesterone receptor biology}
+ER$\alpha$, encoded by \gene{ESR1}, is a nuclear receptor whose transcriptional effects depend on ligand availability, chromatin context and regulatory partners. \gene{PGR} encodes the nuclear progesterone receptor. Experimental work has shown that PR can alter ER-associated chromatin binding and transcription in breast cancer models \cite{Mohammed2015}. Consequently, receptor abundance alone provides an incomplete description of hormone-responsive transcription. Differences in \gene{PGR} may accompany differences in the wider endocrine state even when \gene{ESR1} transcript levels are similar.
+
+Progesterone biology also includes interactions between different mammary cell populations. Experimental studies implicated RANKL in progesterone-associated proliferation and progestin-driven mammary tumorigenesis \cite{Beleut2010,Schramek2010}. These observations provide a rationale for examining \gene{TNFSF11}, which encodes RANKL, alongside \gene{WNT4} and receptor-related markers. They do not establish that the same relationships can be read directly from bulk expression in human tumours. Bulk measurements combine tumour, stromal and immune-cell contributions, and paracrine effects need not produce a large difference in the average transcript signal.
+
+\subsection{Proliferation, signalling and endocrine resistance}
+The focused analysis includes genes associated with the cyclin D--CDK4/6--RB axis, PI3K/AKT/mTOR and MAPK signalling. These pathways provide biological context for the transition from receptor-associated transcription to cell-cycle progression. Several relevant control points depend on phosphorylation, protein localisation or complex formation. A transcript-level comparison can identify associated changes, but cannot determine those regulatory states.
+
+Endocrine resistance is a further, distinct question. Activating \gene{ESR1} mutations have been reported in hormone-resistant metastatic breast cancer \cite{Toy2013,Robinson2013}. The present analysis has neither a mutation assay nor longitudinal treatment-response measurements. It therefore cannot identify these mutations or establish an acquired resistance mechanism. These examples are included to explain why a gene can be clinically relevant while its expression measurement remains insufficient for a clinical conclusion.
+
+\subsection{Study rationale and objectives}
+The project uses an existing public dataset to connect a transparent computational workflow with a limited set of molecular questions. The primary objective is to estimate expression differences between the two source-labelled luminal groups after accounting for recorded batch. The secondary objectives are to examine receptor and proliferation markers, determine whether the differential gene set is enriched for annotated biological processes, and assess which interpretations are supported by the available measurements.
+
+The study is exploratory. It does not train a classifier, estimate survival, compare treatment outcomes or claim validation of a diagnostic signature. The marker panel is a biologically motivated reading aid within the full transcriptome analysis, rather than an independently validated predictive panel.
+
+\section{Materials and methods}
+\subsection{Data source and cohort definition}
+GSE45827 was generated in the context of work on oxidative stress, H2AX and breast cancer \cite{Gruosso2016,GEO}. The series matrix used here contains 155 samples and 29,873 probe sets. Its sample collection comprises 130 primary tumours, 11 normal tissues and 14 cell lines. This secondary analysis addresses a different question from the original investigation: the transcriptional contrast between deposited luminal groups.
+
+Samples were selected using the GEO \texttt{tumor subtype} annotation. Only the 29 Luminal A and 30 Luminal B tumour samples were retained. All other tumour labels, normal tissues and cell lines were excluded before modelling. Sample identifiers were sorted and expression columns were explicitly aligned to the resulting metadata. Eligibility checks required the expected group counts and tumour source descriptions. No sample was removed after inspecting its position in a plot.
+
+\begin{table}[!htbp]
+\centering
+\caption{Composition of the input series and the analysed cohort. The excluded tumour count is the difference between all primary tumours and the selected luminal tumours.}
+\label{tab:cohort}
+\begin{tabularx}{\linewidth}{@{}Xrl@{}}\toprule
+Sample category & Number & Treatment in this study\\\midrule
+Source-labelled Luminal A tumours & 29 & Included\\
+Source-labelled Luminal B tumours & 30 & Included\\
+Other primary tumour labels & 71 & Excluded\\
+Normal tissue samples & 11 & Excluded\\
+Cell lines & 14 & Excluded\\\midrule
+All deposited samples & 155 & Input series\\
+Analysed samples & 59 & Modelled cohort\\\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Expression scale, annotation and probe selection}
+The platform was the Affymetrix Human Genome U133 Plus 2.0 Array (GPL570). The deposited values were reported as GC-RMA-normalised log$_2$ intensities. They were used on that scale, without another log transformation or an RNA-seq normalisation method. Raw CEL files were not reprocessed; the analysis consequently inherits the depositor's preprocessing choices and cannot reconstruct every upstream quality decision.
+
+Probe annotation used the GPL570 annotation dated 9 August 2016. Probe identifiers shared by the matrix and annotation were matched, and entries without a usable single gene symbol were excluded. The code rejected symbols containing ambiguous separators or whitespace and retained symbols matching the documented character pattern. Where several probes mapped to one symbol, the probe with the highest mean intensity across the selected samples was retained. Probe identifier provided a deterministic tie-break. This selection did not use the estimated subtype difference or its significance.
+
+The final gene matrix contained 13,823 rows. One-probe selection avoids counting several probes for the same gene in pathway analysis, but sacrifices information about probe-specific behaviour and possible transcript isoforms. The age of the annotation also limits gene naming and mapping accuracy. These constraints should be considered when interpreting an unexpectedly large effect or the apparent absence of a particular gene.
+
+\subsection{Quality assessment and exploratory ordination}
+Input checks tested identifier uniqueness, column alignment and finite expression values. Sample-level summaries included median intensity, interquartile range and the fraction of non-finite measurements. These summaries detect gross distributional discrepancies, but cannot replace raw-array diagnostics.
+
+PCA was applied to the 3,000 genes with the largest variance across the selected samples. Each gene was centred across samples before singular-value decomposition. Genes were not scaled to unit variance, so more variable genes contributed more strongly to the ordination. Principal-component signs were oriented deterministically for reproducible displays. PCA used the expression matrix before batch adjustment; the model described below, rather than the PCA, supplied the batch-adjusted group estimates.
+
+\subsection{Batch-adjusted differential expression}
+For gene $g$ and sample $i$, the model was
+\begin{equation}
+y_{gi}=\beta_{0g}+\beta_{Bg}I_i(\mathrm{Luminal\ B})+
+\sum_{k=2}^{5}\gamma_{kg}I_i(\mathrm{batch}\ k)+\varepsilon_{gi}.
+\label{eq:model}
+\end{equation}
+Here, $y_{gi}$ is the log$_2$ intensity; Luminal A and batch 1 are the reference categories. The design contains six parameters: an intercept, a subtype coefficient and four batch coefficients. With 59 samples and a full-rank design, the residual degrees of freedom are $59-6=53$. The design rank was checked before fitting. Both groups were represented in each batch (Table~\ref{tab:batch}), allowing the subtype effect to be estimated separately from the recorded batch effect.
+
+The coefficient $\beta_{Bg}$ is the adjusted Luminal B minus Luminal A difference. Positive values indicate a higher log$_2$ signal in B. Although the output column is named \texttt{log2\_fold\_change}, the report uses ``log$_2$ difference'' to emphasise the measured microarray scale. Exponentiating a coefficient gives a ratio on the corresponding intensity scale; it does not yield an absolute molecular concentration.
+
+Ordinary least squares provided gene-wise coefficients and residual variances. The implementation then estimated a common variance prior using moments of the log residual variances, with digamma and trigamma corrections. Residual variances were shrunk towards the fitted prior:
+\begin{equation}
+\widetilde{s}^{\,2}_g=\frac{d_0s_0^2+d_gs_g^2}{d_0+d_g},\qquad
+t_g=\frac{\widehat{\beta}_{Bg}}{\sqrt{\widetilde{s}^{\,2}_g[(X^\top X)^{-1}]_{BB}}}.
+\label{eq:moderation}
+\end{equation}
+In this expression, $s_g^2$ is the residual variance, $d_g=53$, and $s_0^2$ and $d_0$ are the fitted prior scale and degrees of freedom. Two-sided probabilities used a Student $t$ distribution with $d_g+d_0$ degrees of freedom.
+
+Variance moderation follows the general approach developed for microarray linear models \cite{Smyth2004,Ritchie2015}. However, the repository contains an independent Python implementation of a subset of that approach. It does not call Bioconductor limma and has not been compared numerically with limma on this matrix. Robust moderation, mean--variance trend modelling and observation weights were not implemented. The exact probabilities should therefore be treated as provisional pending that comparison.
+
+BH adjustment was applied across all 13,823 gene-level tests \cite{BH1995}. The principal reporting threshold was adjusted $p<0.05$. A second, descriptive selection required both adjusted $p<0.05$ and $|\widehat{\beta}_{Bg}|\geq0.5$. The latter threshold corresponds to an intensity ratio of about 1.41 in either direction. It was applied to the effect estimate after testing; it is not a formal test that the true effect exceeds 0.5. Thus the combined list should not be described as having a separately demonstrated FDR guarantee for a minimum biological effect.
+
+\input{tables/batch.tex}
+
+\subsection{Reactome over-representation analysis}
+Reactome provides curated pathway memberships \cite{Reactome2024}. Release 97 was used here, with its downloaded GMT verified by SHA-256. The universe comprised all 13,823 tested genes; the foreground comprised the 2,775 genes passing the combined significance and magnitude criteria. Each pathway was intersected with the measured-gene universe. Only sets containing 10--500 measured genes were tested.
+
+For a universe of size $N$, a foreground of size $n$, a pathway with $K$ measured genes and an observed overlap $k$, the upper-tail probability was
+\begin{equation}
+P(X\geq k)=\sum_{j=k}^{\min(K,n)}
+\frac{\binom{K}{j}\binom{N-K}{n-j}}{\binom{N}{n}}.
+\label{eq:ora}
+\end{equation}
+BH adjustment was performed over all 1,568 eligible sets. Higher and lower genes were combined, making the analysis non-directional. A significant result indicates more selected genes than expected under the sampling model; it does not show whether the pathway is activated or suppressed. Nested pathways share genes, so related significant categories cannot be counted as separate, independent discoveries.
+
+\subsection{Figures, marker summaries and reproducibility}
+Data figures were generated from the executed matrix and result tables. The heatmap displays the first 30 genes, ranked by adjusted probability, among those passing the combined threshold. Samples are ordered by source label and identifier. Values are centred and scaled within each gene for display. This supervised selection is useful for showing the fitted contrast, but cannot independently validate group separation.
+
+Marker panels show individual log$_2$ signals and group means with approximate normal confidence intervals, calculated as the mean $\pm1.96$ standard errors. These intervals are unadjusted descriptive summaries. The significance values in the panels come from the batch-adjusted model, which answers a different statistical question. The workflow and signalling schematics are conceptual illustrations, not measurements.
+
+Input checksums, tabular results and the six executed notebooks accompany the code. The analysis uses no newly collected patient specimens or personally identifying patient records. Historical coursework informed the background review; its original documents and third-party illustrations remain outside the distributed project. Actual data retrieval and analysis dates are recorded as 16 October 2026.
+
+\fig{01_workflow.png}{1.0}{Computational workflow. Public expression and annotation files are validated before sample selection, gene mapping, quality assessment and modelling. Pathway analysis uses the measured-gene universe. This diagram summarises processing stages and does not depict an experimental intervention.}{fig:workflow}
+
+\clearpage
+\section{Results}
+\subsection{Cohort structure and quality summaries}
+All 59 eligible tumours were retained. The modelled gene matrix contained no missing or non-finite values. Sample medians ranged from 7.176 to 7.665 log$_2$ units and interquartile ranges from 3.767 to 4.201. These ranges describe relatively similar overall distributions after the depositor's normalisation; they do not exclude local artefacts or differences in sample composition.
+
+The two groups occurred in all five recorded batches. Batch 4 contained eight Luminal A and four Luminal B samples, whereas the other batches had slightly more B than A samples. Adjustment was therefore appropriate even though batch and subtype were not completely confounded. Other potential confounders, including tumour purity and clinical characteristics, were not included because suitable measurements were unavailable for the selected contrast.
+
+PC1 explained 15.21\% and PC2 explained 9.29\% of the variance among the 3,000 selected genes, totalling 24.50\%. Figure~\ref{fig:pca} displays the samples in this two-dimensional projection. Most variance lies outside the first two axes. Their appearance should not be treated as a formal test of subtype separation or as evidence that batch effects have been removed.
+
+\fig{02_pca.png}{0.82}{PCA of 59 tumours using the 3,000 most variable mapped genes. Blue denotes source-labelled Luminal A and orange denotes Luminal B. Inputs were centred per gene, without unit-variance scaling or batch removal. Axis percentages refer to variance in this selected feature matrix.}{fig:pca}
+
+\subsection{Extent and direction of differential expression}
+The gene-level model identified 4,310 genes at adjusted $p<0.05$, equivalent to 31.18\% of the 13,823 tested genes. The additional magnitude threshold reduced the list to 2,775 genes (20.08\%). Of these, 1,509 had higher and 1,266 had lower fitted signals in B. These counts describe the present cohort and model; they are not estimates of the number of genes that distinguish all luminal breast cancers.
+
+The volcano plot places the adjusted group coefficient against adjusted significance (Figure~\ref{fig:volcano}). Large positive values include \gene{ERBB2} and \gene{MKI67}, whereas \gene{PGR} has a large negative coefficient. The display also shows why magnitude and statistical evidence need separate consideration. For example, \gene{FOXO1} passes the FDR threshold but falls below the magnitude cutoff, while \gene{WNT4} exceeds the magnitude cutoff but does not pass the FDR threshold.
+
+\fig{03_volcano.png}{0.87}{Differential expression for Luminal B relative to Luminal A. The horizontal axis is the batch-adjusted log$_2$ difference; the vertical axis is $-\log_{10}$ of the BH-adjusted probability. Highlighted points meet both adjusted $p<0.05$ and absolute log$_2$ difference $\geq0.5$. Dashed lines mark those thresholds.}{fig:volcano}
+
+The top-gene heatmap shows a marked label-associated pattern among the selected features (Figure~\ref{fig:heatmap}). Because these genes were selected using the same samples and comparison, the pattern is expected to be stronger than that of an unselected gene panel. Row-standardised colours represent deviations from each gene's mean; a red value for one gene cannot be compared with a red value for another as an absolute expression level.
+
+\fig{04_heatmap.png}{0.95}{Thirty leading genes from the combined-threshold list, ordered by adjusted probability. Each row is scaled to a within-gene z score. Samples are arranged by source subtype and then identifier, with the vertical line separating the groups. This is a descriptive display of selected genes, rather than unsupervised validation.}{fig:heatmap}
+
+\subsection{Hormone-receptor and proliferation markers}
+\gene{PGR} showed the largest absolute difference among the eight principal markers: $-4.993$ log$_2$ units in B relative to A. \gene{MKI67} was higher by 2.716 units, and \gene{ERBB2} by 3.350 units. Each passed both reporting criteria. In contrast, the estimated \gene{ESR1} difference was small ($-0.228$) and its adjusted probability was 0.673. A non-significant difference does not establish equivalence; it indicates that this analysis did not provide sufficient evidence for a difference under the chosen model and correction.
+
+\gene{FOXO1} had a modest negative coefficient ($-0.453$; adjusted $p=0.0409$), whereas \gene{CCND1}, \gene{WNT4} and \gene{TNFSF11} did not pass the gene-level threshold. The complete eight-marker comparison, including retained probe identifiers, is given in Table~\ref{tab:markers}. An extended 18-gene panel appears in Appendix~\ref{app:markers}.
+
+\input{tables/markers.tex}
+
+The individual-sample panels reveal information that a coefficient alone cannot provide, including the spread of observed values within each label (Figure~\ref{fig:markers}). Their group means are not batch-adjusted. In particular, the large \gene{ERBB2} contrast deserves investigation of sample-level receptor annotations before it is interpreted as a defining feature of a luminal subtype. Transcript measurements cannot establish HER2 protein overexpression or amplification.
+
+\gene{CYP19A1}, which encodes aromatase, was not retained in the processed gene matrix. This is recorded as a measurement limitation rather than assigned a zero signal or a non-significant probability. Absence from the processed matrix does not imply absence of aromatase expression in the tumours or absence of aromatase probes from the full platform.
+
+\fig{05_markers.png}{1.0}{Principal marker signals by source group. Each point is one tumour. Black bars show the unadjusted mean and an approximate 95\% normal confidence interval; panel probabilities come from the batch-adjusted model. A and B denote the deposited luminal labels. Signals should be compared within a gene, rather than across different probes.}{fig:markers}
+
+\subsection{Pathway-level results}
+Seventy-five of 1,568 tested Reactome sets had adjusted $p<0.05$. Cell Cycle, Mitotic was the leading set, containing 164 selected genes among 459 measured members. Its overlap was approximately 1.78 times the expectation under random sampling from the measured universe. Mitotic G1 phase and G1/S transition, G1/S Transition, and Cell Cycle Checkpoints also ranked near the top (Table~\ref{tab:pathways}).
+
+These results place the marker observations in a broader transcriptional context. The \gene{MKI67} difference is accompanied by differential genes distributed across mitotic and cell-cycle annotations. However, the ORA foreground combines genes in both directions. The enrichment result alone cannot establish that all members increased, that cells progressed more rapidly through a particular phase, or that any tumour would respond to inhibition of that process.
+
+\input{tables/pathways.tex}
+\fig{06_pathways.png}{1.0}{Leading Reactome release 97 over-representation results. Bar length represents $-\log_{10}$ of the pathway-level BH-adjusted probability. Eligible sets contained 10--500 measured genes. The foreground combines higher and lower genes; shared membership means that several bars may reflect overlapping evidence.}{fig:pathways}
+
+\clearpage
+\section{Discussion}
+\subsection{A proliferation-associated contrast with lower PGR}
+The most coherent finding is the combination of higher \gene{MKI67}, a lower \gene{PGR} signal and enrichment of cell-cycle gene sets in the B-versus-A comparison. This combination is consistent with different proliferation-associated and hormone-responsive transcriptional states in the deposited groups. It is supported by both specific markers and the wider differential list, while remaining conditional on the cohort, sample labels and model.
+
+The absence of a significant \gene{ESR1} difference helps narrow the interpretation. The results do not support a simple explanation in which all receptor-related transcripts rise or fall together. Similar average \gene{ESR1} signals can coexist with differences in \gene{PGR} and proliferation-associated genes. ER function depends on factors that were not measured here, including ligand exposure, regulatory proteins and chromatin accessibility. The PR--ER interaction demonstrated experimentally by Mohammed and colleagues provides relevant context, but this observational dataset does not establish that interaction as the cause of the group difference \cite{Mohammed2015}.
+
+There is also a potential circularity in comparing expression groups whose original definitions may already involve proliferation and receptor information. The deposited labels are available, but their individual classification evidence is not reconstructed in this analysis. Agreement with expected biology is therefore a consistency check, rather than independent proof of a newly discovered luminal mechanism.
+
+\subsection{ERBB2 and heterogeneity within the source labels}
+The size of the \gene{ERBB2} coefficient is a major feature of the result. It could reflect heterogeneity within the labelled B group, differences in the original classification rules, or other cohort-specific characteristics. These possibilities cannot be resolved from the group label and expression value alone. HER2 IHC and in situ hybridisation, where available, would provide more direct evidence about protein abundance and amplification.
+
+The practical consequence is that the result should be reported explicitly rather than absorbed into a generic description of luminal disease. A useful follow-up would cross-tabulate the deposited luminal labels against verified receptor measurements and then repeat the comparison within a consistently defined receptor category. Until then, the present coefficient is a property of this selected contrast, not a diagnostic rule for Luminal B.
+
+\subsection{Why transcript differences do not measure pathway activity}
+The panel includes several genes whose functions depend heavily on events beyond transcription. \gene{FOXO1} illustrates this problem: its modest mRNA decrease does not establish nuclear exclusion, altered phosphorylation or loss of transcription-factor activity. Similarly, the extended panel shows higher \gene{AKT1} transcript signal, but that observation cannot substitute for an assay of AKT phosphorylation. Non-significant \gene{PIK3CA}, \gene{MTOR} or \gene{MAPK1} expression differences do not show that their signalling pathways are inactive.
+
+The same caution applies to \gene{CCND1}, \gene{CDK4}, \gene{CDK6} and \gene{RB1}. Cell-cycle enrichment can occur without every central regulator showing an mRNA difference. Pathway membership provides an organising framework for the selected genes, whereas pathway activity requires additional evidence. Figure~\ref{fig:signalling} shows the molecular relationships used to frame the interpretation; its arrows are conceptual and are not fitted edges inferred from this dataset.
+
+\fig{07_signalling.png}{0.95}{Conceptual relationships among hormone-receptor, growth-factor and cell-cycle signalling. The schematic provides biological context for the marker panel. Arrows are context-dependent relationships from the background literature, and do not represent measured activation, effect size or causal inference in GSE45827.}{fig:signalling}
+
+\subsection{Therapeutic context}
+Established endocrine treatments act at different points in hormone biology. Tamoxifen modulates ER, fulvestrant promotes ER degradation, and aromatase inhibitors such as anastrozole reduce oestrogen synthesis. Their use depends on clinical setting and patient characteristics \cite{NCIHormone}. CDK4/6 inhibitors have defined roles in selected breast-cancer settings, while docetaxel acts through microtubule stabilisation \cite{NCITargeted,NCIDrugs}. These mechanisms explain why the receptor and cell-cycle findings are biologically relevant; they do not convert this expression comparison into a treatment-selection assay.
+
+PR-directed treatment requires particular care in interpretation. Onapristone was investigated in a phase I study of previously treated PR-expressing cancers, including breast cancer \cite{Cottu2018}. That early-phase evidence does not justify inferring sensitivity from \gene{PGR} expression in this cohort. The treatment schematic retains onapristone as an investigational example. No drug-response data, treatment allocation or outcome model was analysed here.
+
+\fig{08_therapies.png}{0.88}{Examples of therapeutic targets discussed in the background literature. The figure distinguishes established agents or classes from investigational onapristone in breast cancer. It is a mechanism summary, not a ranking of treatments or a prediction for any analysed sample. Clinical indications require evidence beyond this study.}{fig:therapies}
+
+\subsection{Strengths and limitations}
+The principal strength is traceability: the sample selection, annotation rules, model design, pathway universe and output tables are explicit. Input checksums make the selected data versions identifiable, and the figures are derived from saved results. Inclusion of non-significant markers prevents the discussion from being restricted to favourable examples.
+
+The first limitation concerns phenotype definition. Source labels have not been independently confirmed against IHC or a documented intrinsic classifier. The second concerns confounding: recorded batch is included, but tumour purity, age, grade, stage and other clinical or molecular covariates are not modelled. Bulk-tissue differences could partly reflect cell composition rather than changes within tumour cells. A fixed batch effect also assumes an additive shift; subtype-by-batch interactions were not investigated.
+
+The third limitation is measurement. The analysis starts from a processed microarray matrix, uses an older annotation and retains one probe per gene. It does not assess alternative transcripts, sequence mutations, copy number, receptor protein abundance or phosphorylation. The fourth is statistical validation. Tests of code behaviour establish that specified operations run as intended, but do not demonstrate equivalence to a reference moderated-model implementation. Exact probabilities and pathway rankings need that independent numerical check.
+
+Finally, the findings come from one selected cohort. There is no external replication, prospective validation or outcome-based assessment. ORA depends on the chosen gene threshold, gene-set sizes and annotation release; related pathway results share genes. These limitations restrict the study to exploratory molecular interpretation.
+
+\subsection{Priorities for further analysis}
+The first priority is to fit the identical matrix and design in Bioconductor limma and compare coefficients, residual and prior degrees of freedom, moderated statistics and adjusted probabilities. This would address the most direct uncertainty in the statistical implementation without changing the scientific question.
+
+The second priority is to verify subtype and receptor annotations and examine whether the \gene{ERBB2} contrast persists under a consistent classification. Replication in an independent cohort should then assess the direction and magnitude of the principal marker differences. A separate sensitivity analysis could compare probe-selection rules and annotation versions. Direction-specific or ranked pathway analyses would help distinguish the consequences of combining higher and lower genes, provided the testing strategy and limitations were reported explicitly. These are proposed extensions and were not performed for this report.
+
+\section{Conclusion}
+In 59 source-labelled luminal breast tumours from GSE45827, a batch-adjusted expression comparison identified lower \gene{PGR}, higher \gene{MKI67} and higher \gene{ERBB2} signals in Luminal B relative to Luminal A. Differential genes were enriched for mitotic and cell-cycle annotations, while \gene{ESR1} did not show a significant difference. The results describe an endocrine-associated and proliferation-associated contrast within this cohort. Independent verification of the model and sample classifications, followed by external replication, is required before stronger biological or clinical claims can be made.
+
+\section*{Data availability and contribution statement}
+\addcontentsline{toc}{section}{Data availability and contribution statement}
+The public input data are available through GEO accession GSE45827 and GPL570; pathway definitions come from Reactome. The project repository contains analysis code, derived tables, figures, notebooks and this report source. Upstream data are retrieved separately using the documented checksums. Tharuniya Anpalakan is the named portfolio author. Earlier group coursework is acknowledged in the source review and is not represented as individual authorship. AI assistance was used for coding and prose drafting; final scientific review and release decisions remain the author's responsibility.
+
+\clearpage
+\addcontentsline{toc}{section}{References}
+\input{bibliography.tex}
+\clearpage
+\appendix
+\section{Extended marker panel}\label{app:markers}
+Table~\ref{tab:extended} records all 18 markers in the saved panel. Adjusted probabilities come from correction across the full set of tested genes, not from a separate test limited to these markers. A dash denotes unavailable measurement rather than a negative result. The panel supplements the main comparison and should not be interpreted as a clinical classifier.
+\input{tables/extended_markers.tex}
+
+\section{Reproduction and file provenance}
+\subsection{Analysis and report commands}
+Run the following commands from the repository root after creating a Python environment and installing \texttt{requirements.txt}. Report compilation additionally requires XeLaTeX. The report builder regenerates the LaTeX tables directly from the saved result CSV files and runs the typesetter until references are resolved.
+\begin{verbatim}
+python -m scripts.download_data
+python -m scripts.run_analysis
+python -m scripts.build_report
+python -m scripts.run_notebooks
+python -m pytest -q
+\end{verbatim}
+The report can also be compiled directly from its source bundle: select XeLaTeX as the compiler and \texttt{molecular\_transcriptomic\_analysis.tex} as the main file. The bundle contains the generated tables and figure assets, so Python is not required solely to typeset an unchanged report. The original short Markdown report is retained as an earlier narrative; this LaTeX document is the detailed report.
+
+\subsection{Input identity and scope of verification}
+The three analysis inputs were retrieved on 16 October 2026. Their SHA-256 values are reproduced below from \texttt{results/summary.json}. Because the Reactome download uses a moving current-release URL, a future download must match the pinned checksum or be treated as a deliberate input-version change.
+\input{tables/hashes.tex}
+
+The recorded analysis audit reports eight passing Python tests and six executed notebooks with no cell error outputs. These checks cover data handling and implemented operations; they do not constitute independent biological validation or numerical validation against limma. Raw data, the local Python environment and private historical documents are excluded from the repository. The report's date records the actual analysis period independently of Git commit timestamps.
+\end{document}
