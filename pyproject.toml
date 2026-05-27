@@ -1,0 +1,10 @@
+[project]
+name = "hr-positive-breast-cancer-transcriptomics"
+version = "0.1.0"
+description = "Reproducible analysis of luminal breast cancer microarrays"
+requires-python = ">=3.11"
+dependencies = ["numpy>=2.0", "pandas>=2.2", "scipy>=1.15", "statsmodels>=0.14", "matplotlib>=3.9", "reportlab>=4.2", "nbformat>=5.10", "nbclient>=0.10", "ipykernel>=6.29"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

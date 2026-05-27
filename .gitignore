@@ -1,0 +1,12 @@
+private_sources/
+*.docx
+*.pdf
+!reports/molecular_transcriptomic_analysis.pdf
+data/raw/
+data/processed/
+__pycache__/
+.pytest_cache/
+.ipynb_checkpoints/
+.venv/
+*.tmp
+.env
